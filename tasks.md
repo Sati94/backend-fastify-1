@@ -14,15 +14,38 @@ You can try out the `GET /api/pets`, `POST /api/pets` endpoints.
 
 Answer the following questions:
 
-- Which architecture is applied in this repo?
+- Which architecture is applied in this repo? 
+  layered architecture
 - What kind of elements/components can you identify?
+
+Controllers: Kezeli a bejövő kéréseket, interakcióba lép a szolgáltatásokkal és válaszokat küld.
+Services (if present): Üzleti logikát tartalmaznak, közvetítőként működnek a vezérlők és az adattárak között.
+Repositories (ownerRepository.ts, petRepository.ts): kölcsönhatásba léphet az adatbázissal, kezelheti az adatlekérést és -kezelést.
+Entities (pet-type.ts): Az adatentitások szerkezetét reprezentáló típusok vagy interfészek meghatározása
+Database Client (DbClient): Likely an abstraction layer or dependency that manages database connections.
+
 - Where is the entry point of the repo?
+server.ts
 - What is the scope of the repositories?
+ A repok a közvetlen adatbázis-műveletekre összpontosítanak, különösen az egyes entitások (például tulajdonos és házi kedvenc) CRUD funkcióira. Minden adattár absztrahálja az adatokhoz való hozzáférést, így az adatkezelőknek vagy a szolgáltatásoknak nem kell az adatbázis részleteivel foglalkozniuk.
+
 - What is the scope of the services?
+  Üzleti logika beágyazása lenne a hatóköre. Ez az a hely, ahol összetett műveleteket kezelhet, amelyek több lépést vagy adattár-interakciókat foglalnak magukban. A szolgáltatások hídként működnek a vezérlők és a tárolók között, egyértelmű interfészt biztosítva az alkalmazáslogikához.
 - What is happening in the controllers?
+ a bejövő HTTP kéréseket kezelik. Elemezik a kérésadatokat, meghívják a megfelelő szolgáltatást (vagy tárolót, ha nem létezik szolgáltatási réteg), és visszaküldik a megfelelő HTTP-választ a kért művelet eredménye alapján.
+
 - Why do we use the `DbClient` type in the pet repository?
+A DbClient típus az adatbázis-interakciók szabványosított kezelésére szolgál. Valószínűleg konzisztens felületet biztosít az adatbázis-műveletekhez, például a kapcsolatok megnyitásához és zárásához, a tranzakciók kezeléséhez és a lekérdezések futtatásához. Ez az absztrakció elősegíti a kód újrafelhasználását, és segít elkerülni a duplikált kapcsolati logikát a tárolókban.
+
 - What would you improve in this codebase?
+Error Handling
+Environment Configuration
+Validation: Hogy a vezérlők megkapják a várt adatformátumokat és értékeket, csökkentve ezzel a futásidejű hibák kockázatát.
+Logging
+
 - How does the code handle the `async` route handlers?
+
+Aszinkron útvonalkezelők kezelése: Ha az útvonalkezelők aszinkronok, a kódnak minden aszinkron funkción belül try/catch blokkokat kell használnia a lehetséges hibák kezelésére és a megfelelő hibaválaszok küldésére. Alternatív megoldásként beállítható egy hibakezelő köztes szoftver is, amely felfogja a kezeletlen ígéretek elutasítását az alkalmazásban, és normál hibaüzenettel válaszol.
 
 ### Background material
 

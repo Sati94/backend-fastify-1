@@ -10,3 +10,14 @@ POST {{host}}/api/pets
 Content-Type: application/json
 
 {"name": "Fluffy", "age": 5, "weightInKg": 7}
+
+###
+
+GET {{host}}/api/owners
+
+###
+
+POST {{host}}/api/owners
+Content-Type: application/json
+
+{"name": "John", "age": 25}
