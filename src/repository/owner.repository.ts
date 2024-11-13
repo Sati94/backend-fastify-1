@@ -3,6 +3,7 @@ import { Owner, OwnerToCreate } from "../entity/owner.type";
 
 export class OwnerRepository {
     private readonly client: DbClient;
+
     constructor(dbClient: DbClient) {
         this.client = dbClient
     }
