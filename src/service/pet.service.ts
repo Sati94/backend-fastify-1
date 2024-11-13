@@ -9,7 +9,8 @@ export class PetService {
   }
 
   async getAll() {
-    return await this.repository.read();
+    const pets = await this.repository.read();
+    return pets;
   }
 
   async create(pet: PetToCreate) {
