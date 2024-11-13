@@ -1,23 +1,15 @@
-import { PetService } from '../service/pet.service';
 import { petSchema } from '../entity/schema/pet-schema';
 import { PetToCreate } from '../entity/pet.type';
 import { FastifyInstance } from 'fastify';
 import { JsonSchemaToTsProvider } from '@fastify/type-provider-json-schema-to-ts';
 
-type RoutesDependencies = {
-    petService: PetService
-}
-export async function petRoutes(
-    app: FastifyInstance,
-    dependencies: RoutesDependencies
+export async function petRoutes(app: FastifyInstance) {
 
-) {
-    const { petService } = dependencies;
     const typeApp = app.withTypeProvider<JsonSchemaToTsProvider>();
 
 
     typeApp.get('/api/pets', async () => {
-        const pets = await petService.getAll();
+        const pets = await app.petService.getAll();
         return pets;
     });
 
@@ -25,7 +17,7 @@ export async function petRoutes(
         schema: petSchema,
     }, async (request, reply) => {
         const petToCreate = request.body as PetToCreate;
-        const createdPet = await petService.create(petToCreate);
+        const createdPet = await app.petService.create(petToCreate);
         reply.status(201);
         return createdPet;
     });
