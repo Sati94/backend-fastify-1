@@ -23,6 +23,9 @@ export default function createApp(options = {}, dependencies: Dependencies) {
 
   const app = fastify(options).withTypeProvider<JsonSchemaToTsProvider>();
 
+  app.decorate('petService', petService);
+  app.decorate('ownerService', ownerService);
+
   app.register(ownerRoutes, { ownerService });
   app.register(petRoutes, { petService })
 
