@@ -13,7 +13,6 @@ export const ownerSchema = {
             type: 'object',
             properties: {
                 name: { type: 'string' },
-
             },
         },
     },
