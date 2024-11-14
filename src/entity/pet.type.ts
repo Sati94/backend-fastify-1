@@ -7,3 +7,4 @@ export type Pet = {
 };
 
 export type PetToCreate = Omit<Pet, 'id'>;
+export type PetDataUpdate = Partial<Omit<Pet, 'id'>>;

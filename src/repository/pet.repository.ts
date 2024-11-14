@@ -1,5 +1,5 @@
 import { DbClient } from "../db";
-import { Pet, PetToCreate } from "../entity/pet.type";
+import { Pet, PetDataUpdate, PetToCreate } from "../entity/pet.type";
 
 export class PetRepository {
   private readonly client;
@@ -39,5 +39,29 @@ export class PetRepository {
     `
     const rows = await this.client.query(sql, [name, age, weightInKg, kind_id]) as Array<unknown>
     return rows.map(this.toEntity)[0]
+  }
+
+  async modify(id: number, petData: PetDataUpdate): Promise<Pet | null> {
+
+    const fields = Object.keys(petData);
+    const values = Object.values(petData);
+
+    if (fields.length === null) {
+      return null;
+    }
+
+    const setClauses = fields
+      .map((field, index) => {
+        if (field === "weightInKg") {
+          return `weight_in_kg = $${index + 2}`;
+        }
+        return `${field} = $${index + 2}`;
+      })
+      .join(', ');
+
+    const sql = `UPDATE pet SET ${setClauses} WHERE id = $1 RETURNING *;`;
+
+    const rows = await this.client.query(sql, [id, ...values]) as Array<unknown>;
+    return rows.length > 0 ? this.toEntity(rows[0]) : null;
   }
 }

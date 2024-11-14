@@ -1,4 +1,5 @@
 import { PetToCreate } from "../entity/pet.type";
+import { PetDataUpdate } from "../entity/pet.type";
 import { PetRepository } from "../repository/pet.repository"
 
 export class PetService {
@@ -15,5 +16,9 @@ export class PetService {
 
   async create(pet: PetToCreate) {
     return await this.repository.create(pet);
+  }
+
+  async modifyPet(id: number, pet: PetDataUpdate) {
+    return await this.repository.modify(id, pet);
   }
 }
