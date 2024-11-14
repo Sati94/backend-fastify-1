@@ -9,19 +9,20 @@ export class PetRepository {
   }
 
   private toEntity(record: any): Pet {
-    const { id, name, age, weight_in_kg, kind } = record;
+    const { id, name, age, weight_in_kg, kind, owner_id } = record;
     return {
       id,
       name,
       age,
       weightInKg: parseFloat(weight_in_kg),
-      kind_id: kind || null
+      kind_id: kind || null,
+      owner_id: owner_id || null,
     }
   }
 
   async read({ limit, offset }: { limit?: number, offset?: number } = {}) {
     const sql =
-      `SELECT p.id, p.name, p.age, p.weight_in_kg, pk.name as kind
+      `SELECT p.id, p.name, p.age, p.weight_in_kg, p.owner_id, pk.name as kind
        FROM pet p
        LEFT JOIN pet_kind pk ON p.kind_id = pk.id  
        LIMIT $1 OFFSET $2;`
@@ -63,5 +64,38 @@ export class PetRepository {
 
     const rows = await this.client.query(sql, [id, ...values]) as Array<unknown>;
     return rows.length > 0 ? this.toEntity(rows[0]) : null;
+  }
+
+  async assignOwnerToPet(petId: number, ownerId: number): Promise<Pet | null> {
+
+    const petCheckSql = 'SELECT id FROM pet WHERE id = $1';
+    const petCheckResult = await this.client.query(petCheckSql, [petId]) as Array<unknown>;
+
+    if (petCheckResult.length === 0) {
+      throw new Error('Pet not found');
+    };
+
+    const ownerCheckSql = 'SELECT id FROM pet_owner WHERE id = $1';
+    const ownerCheckResult = await this.client.query(ownerCheckSql, [ownerId]) as Array<unknown>;
+
+    if (ownerCheckResult.length === 0) {
+      throw new Error('Owner not found');
+    }
+
+
+    const sql = `
+    UPDATE pet
+    SET owner_id = $2
+    WHERE id = $1
+    RETURNING *;
+    `;
+    const rows = await this.client.query(sql, [petId, ownerId]) as Array<unknown>;
+
+    // Az új kapcsolati rekord visszaadása
+    if (rows.length > 0) {
+      return this.toEntity(rows[0]);
+    }
+    return null;
+
   }
 }
