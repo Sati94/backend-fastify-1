@@ -21,4 +21,8 @@ export class PetService {
   async modifyPet(id: number, pet: PetDataUpdate) {
     return await this.repository.modify(id, pet);
   }
+
+  async addOwnerToPet(petId: number, ownerId: number) {
+    return await this.repository.assignOwnerToPet(petId, ownerId);
+  }
 }
